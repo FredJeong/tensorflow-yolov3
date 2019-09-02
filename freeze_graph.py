@@ -17,7 +17,7 @@ from core.yolov3 import YOLOV3
 
 pb_file = "./yolov3_coco.pb"
 ckpt_file = "./checkpoint/yolov3_coco_demo.ckpt"
-output_node_names = ["input/input_data", "pred_sbbox/concat", "pred_mbbox/concat", "pred_lbbox/concat"]
+output_node_names = ["input/input_data", "pred_sbbox/Reshape", "pred_mbbox/Reshape", "pred_lbbox/Reshape"]
 
 with tf.name_scope('input'):
     input_data = tf.placeholder(dtype=tf.float32, name='input_data')

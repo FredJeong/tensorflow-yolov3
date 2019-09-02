@@ -96,7 +96,8 @@ class YOLOV3(object):
 
     def decode(self, conv_output, anchors, stride):
         """
-        return tensor of shape [batch_size, output_size, output_size, anchor_per_scale, 5 + num_classes]
+        return tensor of shape [batch_size, output_size,
+                                output_size, anchor_per_scale, 5 + num_classes]
         contains (x, y, w, h, score, probability)
         """
 
@@ -128,10 +129,16 @@ class YOLOV3(object):
         pred_w = tf.exp(conv_raw_dw) * anchors[:, 0] * stride
         pred_h = tf.exp(conv_raw_dh) * anchors[:, 1] * stride
 
-        pred_xywh = tf.stack([pred_x, pred_y, pred_w, pred_h], axis=-1)
-        pred_conf_prob = tf.reshape(conv_sigmoid, (batch_size, output_size, output_size, anchor_per_scale, STEP))[:, :, :, :, 4:]
 
-        return tf.concat([pred_xywh, pred_conf_prob], axis=-1)
+        result = tf.concat([
+            tf.concat([
+                pred_x[:, :, :, i:i+1], pred_y[:, :, :, i:i+1],
+                pred_w[:, :, :, i:i+1], pred_h[:, :, :, i:i+1],
+                conv_sigmoid[:, :, :, 4 + STEP * i: STEP * (i + 1)]], axis=-1)
+            for i in range(anchor_per_scale)], axis=-1)
+
+        return tf.reshape(result,
+            (batch_size, output_size, output_size, anchor_per_scale, STEP))
 
     def focal(self, target, actual, alpha=1, gamma=2):
         focal_loss = alpha * tf.pow(tf.abs(target - actual), gamma)
