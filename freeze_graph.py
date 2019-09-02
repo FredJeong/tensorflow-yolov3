@@ -17,13 +17,14 @@ from core.yolov3 import YOLOV3
 
 pb_file = "./yolov3_coco.pb"
 ckpt_file = "./checkpoint/yolov3_coco_demo.ckpt"
-output_node_names = ["input/input_data", "pred_sbbox/concat_2", "pred_mbbox/concat_2", "pred_lbbox/concat_2"]
+output_node_names = ["input/input_data", "pred_sbbox/concat", "pred_mbbox/concat", "pred_lbbox/concat"]
 
 with tf.name_scope('input'):
     input_data = tf.placeholder(dtype=tf.float32, name='input_data')
 
 model = YOLOV3(input_data, trainable=False)
 print(model.conv_sbbox, model.conv_mbbox, model.conv_lbbox)
+print(model.pred_sbbox, model.pred_mbbox, model.pred_lbbox)
 
 sess  = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
 saver = tf.train.Saver()
